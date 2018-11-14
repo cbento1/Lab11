@@ -11,18 +11,40 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
  * Main class for our UI design lab.
  */
-public final class MainActivity extends AppCompatActivity {
+public final class MainActivity extends AppCompatActivity implements View.OnClickListener {
     /** Default logging tag for messages from the main activity. */
     private static final String TAG = "Lab11:Main";
 
     /** Request queue for our API requests. */
     private static RequestQueue requestQueue;
+
+    /** Button which starts ip lookup. */
+    private Button ipButton;
+    /**
+     *  Text box for crush ip.
+     */
+    private EditText ipBox;
+    /** A textView th
+     * at shows the address. */
+    private TextView addressTextView;
+    @Override
+    public void onClick(final View view) {
+        String ip = "";
+        ip = ipBox.getText().toString();
+        startAPICall(ip);
+    }
+
 
     /**
      * Run when this activity comes to the foreground.
@@ -38,7 +60,10 @@ public final class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        startAPICall("192.17.96.8");
+        ipButton = findViewById(R.id.lookup_ip);
+        addressTextView = findViewById(R.id.addressTextView);
+        ipBox  = findViewById(R.id.input_ip);
+        ipButton.setOnClickListener(this);
     }
 
     /**
@@ -87,7 +112,17 @@ public final class MainActivity extends AppCompatActivity {
         try {
             Log.d(TAG, response.toString(2));
             // Example of how to pull a field off the returned JSON object
-            Log.i(TAG, response.get("hostname").toString());
+            String city = response.get("city").toString();
+            String region = response.get("region").toString();
+            String country = response.get("country").toString();
+            String postal = response.get("postal").toString();
+            String coordinates = response.get("loc").toString();
+            String combinedString = "Your crush is located at: " + city
+                    + " in the region of " + region
+                    + " in the country of " + country
+                    + ". Their postal address is " + postal
+                    + ". Should you wish to send a drone, the coordinates are: "+ coordinates;
+            addressTextView.setText(combinedString);
         } catch (JSONException ignored) { }
     }
 }
